@@ -1,0 +1,44 @@
+
+
+# Clone the repo
+git clone https://github.com/imartinez/privateGPT
+cd privateGPT
+
+
+# gpt
+sudo apt update
+sudo apt install curl git make build-essential libssl-dev zlib1g-dev libbz2-dev \
+libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
+xz-utils tk-dev libffi-dev liblzma-dev python3-openssl python3-pip
+
+
+git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+echo 'export PATH="$HOME/.pyenv/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(pyenv init --path)"' >> ~/.bashrc
+echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
+source ~/.bashrc
+
+pyenv install 3.11
+pyenv local 3.11
+
+pip install poetry==1.7.1
+poetry install --with ui,local
+
+
+
+
+# Download Embedding and LLM models
+poetry run python scripts/setup
+
+# (Optional) For Mac with Metal GPU, enable it. Check Installation and Settings section 
+to know how to enable GPU on other platforms
+CMAKE_ARGS="-DLLAMA_METAL=on" pip install --force-reinstall --no-cache-dir llama-cpp-python
+
+# Run the local server  
+PGPT_PROFILES=local make run
+
+# Note: on Mac with Metal you should see a ggml_metal_add_buffer log, stating GPU is 
+being used
+
+# Navigate to the UI and try it out! 
+http://localhost:8001/
